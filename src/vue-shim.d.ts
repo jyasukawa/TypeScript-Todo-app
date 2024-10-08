@@ -1,0 +1,1 @@
+declare module '*.vue' //TypeScript は .vue ファイルの型を認識しないため、.vue ファイルの型宣言を行う vue-shim.d.ts ファイルを作成
