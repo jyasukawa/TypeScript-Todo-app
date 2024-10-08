@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
+import ButtonComponent from './components/ButtonComponent.vue'; // 新しいボタンコンポーネントをインポート
 
 const newTask = ref('');
 const tasks = ref<string[]>([]);
@@ -48,9 +49,9 @@ const saveTask = (index: number) => {
     editingIndex.value = null;
     editTask.value = '';
     saveTasks();
-  }
-  else
+  } else {
     alert('タスク内容が空です。入力してください。');
+  }
 };
 
 const onNewTaskFocus = () => {
@@ -68,15 +69,15 @@ onMounted(() => {
     <h1>Todoリスト</h1>
     <div>
       <input type="text" v-model="newTask" placeholder="ここに追加したいことを入力" @focus="onNewTaskFocus">
-      <button @click="addTask">追加</button>
+      <ButtonComponent label="追加" @click="addTask" />
     </div>
     <ul>
       <li v-for="(task, index) in tasks" :key="index">
         <span v-if="editingIndex !== index">{{ task }}</span>
         <input v-else type="text" v-model="editTask">
-        <button v-if="editingIndex !== index" @click="editTaskStart(index, task)">編集</button>
-        <button v-if="editingIndex === index" @click="saveTask(index)">保存</button>
-        <button @click="deleteTask(index)">削除</button>
+        <ButtonComponent v-if="editingIndex !== index" label="編集" @click="editTaskStart(index, task)" />
+        <ButtonComponent v-if="editingIndex === index" label="保存" @click="saveTask(index)" />
+        <ButtonComponent label="削除" @click="deleteTask(index)" />
       </li>
     </ul>
   </div>
@@ -120,10 +121,5 @@ li span {
 li input {
   flex-grow: 1;
   width: 1px;
-}
-
-button {
-  padding: 5.5px;
-  margin-left: 5px;
 }
 </style>
