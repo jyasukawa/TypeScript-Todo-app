@@ -1,30 +1,129 @@
 <script setup lang="ts">
-import HelloWorld from './components/HelloWorld.vue'
+import { ref, onMounted } from 'vue';
+
+const newTask = ref('');
+const tasks = ref<string[]>([]);
+const editingIndex = ref<number | null>(null);
+const editTask = ref('');
+
+const loadTasks = () => {
+  const savedTasks = localStorage.getItem('tasks');
+  if (savedTasks) {
+    tasks.value = JSON.parse(savedTasks);
+  }
+};
+
+const saveTasks = () => {
+  localStorage.setItem('tasks', JSON.stringify(tasks.value));
+};
+
+const addTask = () => {
+  if (newTask.value.trim()) {
+    tasks.value.push(newTask.value.trim());
+    saveTasks();
+    newTask.value = '';
+  }
+};
+
+const deleteTask = (index: number) => {
+  if (editingIndex.value === index) {
+    editingIndex.value = null;
+    editTask.value = '';
+  } else if (editingIndex.value !== null && editingIndex.value > index) {
+    editingIndex.value -= 1; // 削除後に editingIndex がズレないように調整
+  }
+  tasks.value.splice(index, 1);
+  saveTasks();
+};
+
+const editTaskStart = (index: number, task: string) => {
+  editingIndex.value = index;
+  editTask.value = task;
+  newTask.value = '';
+};
+
+const saveTask = (index: number) => {
+  if (editTask.value.trim()) {
+    tasks.value[index] = editTask.value.trim();
+    editingIndex.value = null;
+    editTask.value = '';
+    saveTasks();
+  }
+  else
+    alert('タスク内容が空です。入力してください。');
+};
+
+const onNewTaskFocus = () => {
+  editingIndex.value = null;
+  editTask.value = '';
+};
+
+onMounted(() => {
+  loadTasks();
+});
 </script>
 
 <template>
-  <div>
-    <a href="https://vitejs.dev" target="_blank">
-      <img src="/vite.svg" class="logo" alt="Vite logo" />
-    </a>
-    <a href="https://vuejs.org/" target="_blank">
-      <img src="./assets/vue.svg" class="logo vue" alt="Vue logo" />
-    </a>
+  <div class="main-container">
+    <h1>Todoリスト</h1>
+    <div>
+      <input type="text" v-model="newTask" placeholder="ここに追加したいことを入力" @focus="onNewTaskFocus">
+      <button @click="addTask">追加</button>
+    </div>
+    <ul>
+      <li v-for="(task, index) in tasks" :key="index">
+        <span v-if="editingIndex !== index">{{ task }}</span>
+        <input v-else type="text" v-model="editTask">
+        <button v-if="editingIndex !== index" @click="editTaskStart(index, task)">編集</button>
+        <button v-if="editingIndex === index" @click="saveTask(index)">保存</button>
+        <button @click="deleteTask(index)">削除</button>
+      </li>
+    </ul>
   </div>
-  <HelloWorld msg="Vite + Vue" />
 </template>
 
-<style scoped>
-.logo {
-  height: 6em;
-  padding: 1.5em;
-  will-change: filter;
-  transition: filter 300ms;
+<style>
+.main-container {
+  display: flex;
+  align-items: center;
+  flex-direction: column;
 }
-.logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
+
+input {
+  width: 300px;
+  height: 30px;
 }
-.logo.vue:hover {
-  filter: drop-shadow(0 0 2em #42b883aa);
+
+ul {
+  padding: 0;
+}
+
+li {
+  display: flex;
+  align-items: center;
+  list-style-type: none;
+  width: 343px;
+  height: 50px;
+  border: 1px solid red;
+  margin-bottom: 10px;
+  padding: 0 0 0 10px;
+}
+
+li span {
+  flex-grow: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  width: 1px;
+}
+
+li input {
+  flex-grow: 1;
+  width: 1px;
+}
+
+button {
+  padding: 5.5px;
+  margin-left: 5px;
 }
 </style>
