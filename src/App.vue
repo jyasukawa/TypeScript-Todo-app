@@ -1,13 +1,11 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
-import ButtonComponent from './components/ButtonComponent.vue'; // 新しいボタンコンポーネントをインポート
 import TitleComponent from './components/TitleComponent.vue';
 import TaskInputComponent from './components/TaskInputComponent.vue';
+import TaskItemComponent from './components/TaskItemComponent.vue';
 
-const newTask = ref('');
 const tasks = ref<string[]>([]);
 const editingIndex = ref<number | null>(null);
-const editTask = ref('');
 
 const loadTasks = () => {
   const savedTasks = localStorage.getItem('tasks');
@@ -26,36 +24,27 @@ const addNewTask = (task: string) => {
 };
 
 const deleteTask = (index: number) => {
-  if (editingIndex.value === index) {
-    editingIndex.value = null;
-    editTask.value = '';
-  } else if (editingIndex.value !== null && editingIndex.value > index) {
-    editingIndex.value -= 1; // 削除後に editingIndex がズレないように調整
-  }
   tasks.value.splice(index, 1);
+  if (editingIndex.value !== null && editingIndex.value > index) {
+    editingIndex.value--;
+  } else if (editingIndex.value === index) {
+    editingIndex.value = null;
+  }
   saveTasks();
 };
 
-const editTaskStart = (index: number, task: string) => {
-  editingIndex.value = index;
-  editTask.value = task;
-  newTask.value = '';
-};
-
-const saveTask = (index: number) => {
-  if (editTask.value.trim()) {
-    tasks.value[index] = editTask.value.trim();
-    editingIndex.value = null;
-    editTask.value = '';
-    saveTasks();
-  } else {
-    alert('タスク内容が空です。入力してください。');
-  }
-};
-
-const onNewTaskFocus = () => {
+const saveTask = (index: number, task: string) => {
+  tasks.value[index] = task;
   editingIndex.value = null;
-  editTask.value = '';
+  saveTasks();
+};
+
+const startEditing = (index: number) => {
+  editingIndex.value = index;
+};
+
+const cancelEditing = () => {
+  editingIndex.value = null;
 };
 
 onMounted(() => {
@@ -63,21 +52,30 @@ onMounted(() => {
 });
 </script>
 
+
+
 <template>
   <div class="main-container">
     <TitleComponent>Todoリスト</TitleComponent>
-    <TaskInputComponent :addButtonPushed="addNewTask" @click="onNewTaskFocus"/>
+    <TaskInputComponent :addButtonPushed="addNewTask" @onNewTaskFocus="cancelEditing"/>
     <ul>
-      <li v-for="(task, index) in tasks" :key="index">
-        <span v-if="editingIndex !== index">{{ task }}</span>
-        <input v-else type="text" v-model="editTask">
-        <ButtonComponent v-if="editingIndex !== index" label="編集" @click="editTaskStart(index, task)" />
-        <ButtonComponent v-if="editingIndex === index" label="保存" @click="saveTask(index)" />
-        <ButtonComponent label="削除" @click="deleteTask(index)" />
-      </li>
+      <TaskItemComponent
+        v-for="(task, index) in tasks"
+        :key="index"
+        :task="task"
+        :index="index"
+        :isEditing="editingIndex === index"
+        @deleteTask="deleteTask"
+        @saveTask="saveTask"
+        @startEditing="startEditing"
+        @cancelEditing="cancelEditing"
+      />
     </ul>
   </div>
 </template>
+<!-- isEditing プロパティを true または false のブール値で子コンポーネントに渡し,子コンポーネントは、props を通じてこの値を受け取る。 -->
+
+
 
 <style>
 .main-container {
@@ -88,29 +86,5 @@ onMounted(() => {
 
 ul {
   padding: 0;
-}
-
-li {
-  display: flex;
-  align-items: center;
-  list-style-type: none;
-  width: 343px;
-  height: 50px;
-  border: 1px solid red;
-  margin-bottom: 10px;
-  padding: 0 0 0 10px;
-}
-
-li span {
-  flex-grow: 1;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  width: 1px;
-}
-
-li input {
-  flex-grow: 1;
-  width: 1px;
 }
 </style>
