@@ -2,6 +2,7 @@
 import { ref, onMounted } from 'vue';
 import ButtonComponent from './components/ButtonComponent.vue'; // 新しいボタンコンポーネントをインポート
 import TitleComponent from './components/TitleComponent.vue';
+import TaskInputComponent from './components/TaskInputComponent.vue';
 
 const newTask = ref('');
 const tasks = ref<string[]>([]);
@@ -19,12 +20,9 @@ const saveTasks = () => {
   localStorage.setItem('tasks', JSON.stringify(tasks.value));
 };
 
-const addTask = () => {
-  if (newTask.value.trim()) {
-    tasks.value.push(newTask.value.trim());
-    saveTasks();
-    newTask.value = '';
-  }
+const addNewTask = (task: string) => {
+  tasks.value.push(task);
+  saveTasks();
 };
 
 const deleteTask = (index: number) => {
@@ -67,13 +65,8 @@ onMounted(() => {
 
 <template>
   <div class="main-container">
-    <TitleComponent>
-      Todoリスト
-    </TitleComponent>
-    <div>
-      <input type="text" v-model="newTask" placeholder="ここに追加したいことを入力" @focus="onNewTaskFocus">
-      <ButtonComponent label="追加" @click="addTask" />
-    </div>
+    <TitleComponent>Todoリスト</TitleComponent>
+    <TaskInputComponent :addButtonPushed="addNewTask" @click="onNewTaskFocus"/>
     <ul>
       <li v-for="(task, index) in tasks" :key="index">
         <span v-if="editingIndex !== index">{{ task }}</span>
@@ -91,11 +84,6 @@ onMounted(() => {
   display: flex;
   align-items: center;
   flex-direction: column;
-}
-
-input {
-  width: 300px;
-  height: 30px;
 }
 
 ul {
