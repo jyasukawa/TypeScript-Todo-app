@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
 import ButtonComponent from './components/ButtonComponent.vue'; // 新しいボタンコンポーネントをインポート
+import TitleComponent from './components/TitleComponent.vue';
 
 const newTask = ref('');
 const tasks = ref<string[]>([]);
@@ -66,7 +67,9 @@ onMounted(() => {
 
 <template>
   <div class="main-container">
-    <h1>Todoリスト</h1>
+    <TitleComponent>
+      Todoリスト
+    </TitleComponent>
     <div>
       <input type="text" v-model="newTask" placeholder="ここに追加したいことを入力" @focus="onNewTaskFocus">
       <ButtonComponent label="追加" @click="addTask" />
