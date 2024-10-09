@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, watch } from 'vue';
+import { ref } from 'vue';
 import ButtonComponent from './ButtonComponent.vue';
 
 const props = defineProps<{
@@ -17,9 +17,9 @@ const emit = defineEmits<{
 
 const editTask = ref(props.task);
 
-watch(() => props.task, (newTask) => {
-    editTask.value = newTask;
-});
+// watch(() => props.task, (newTask) => {
+//     editTask.value = newTask;
+// });
 //props.task が変更されるたびに、watch がコールバック関数を実行。
 //(newTask) => { editTask.value = newTask; }（コールバック関数）
 
@@ -38,13 +38,9 @@ const handleDelete = () => {
     emit('deleteTask', props.index);
 };
 
-const cancelEdit = () => {
-    // 編集内容を元の task 値に戻す
+const update = () => {
     editTask.value = props.task;
-
-    // 編集をキャンセルするイベントを発行する
-    emit('cancelEditing');
-    };
+};
 </script>
 
 
@@ -52,11 +48,16 @@ const cancelEdit = () => {
 <template>
     <li>
         <span v-if="!isEditing">{{ task }}</span>
-        <input v-else type="text" v-model="editTask" @blur="cancelEdit">
-        <ButtonComponent v-if="!isEditing" label="編集" @click="emit('startEditing', index)" />
+        <input v-else type="text" v-model="editTask">
+        <ButtonComponent v-if="!isEditing" label="編集" @click="() => { emit('startEditing', index); update(); }" />
         <ButtonComponent v-else label="保存" @click="saveTask" />
         <ButtonComponent label="削除" @click="handleDelete" />
     </li>
+    <!-- <p>
+        {{ index }}<br>
+        {{ task }}<br>
+        {{ editTask }}
+    </p> -->
 </template>
 
 
