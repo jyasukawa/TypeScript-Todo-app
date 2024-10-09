@@ -1,5 +1,5 @@
 <script setup lang="ts">
-const { label } = defineProps<{ // Props としてボタンのラベルを受け取る
+const props = defineProps<{ // Props としてボタンのラベルを受け取る
     label: string;
 }>();
 
@@ -13,7 +13,7 @@ const handleClick = () => {
 
 
 <template>
-    <button @click="handleClick">{{ label }}</button>
+    <button @click="handleClick">{{ props.label }}</button>
 </template>
 
 
