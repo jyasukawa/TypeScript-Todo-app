@@ -38,8 +38,13 @@ const handleDelete = () => {
     emit('deleteTask', props.index);
 };
 
-const update = () => {
-    editTask.value = props.task;
+// const update = () => {
+//     editTask.value = props.task;
+// };
+
+const handleEdit = () => {
+  emit('startEditing', props.index); // イベントをemit
+  editTask.value = props.task; // `editTask`の更新処理
 };
 </script>
 
@@ -49,7 +54,9 @@ const update = () => {
     <li>
         <span v-if="!isEditing">{{ task }}</span>
         <input v-else type="text" v-model="editTask">
-        <ButtonComponent v-if="!isEditing" label="編集" @click="() => { emit('startEditing', index); update(); }" />
+        <ButtonComponent v-if="!isEditing" label="編集" @click="handleEdit"/>
+        <!-- <ButtonComponent v-if="!isEditing" label="編集" @click="() => { emit('startEditing', index); update(); }" /> -->
+            <!-- @click=の関数を一つにまとめる -->
         <ButtonComponent v-else label="保存" @click="saveTask" />
         <ButtonComponent label="削除" @click="handleDelete" />
     </li>
