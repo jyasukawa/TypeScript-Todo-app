@@ -17,12 +17,6 @@ const emit = defineEmits<{
 
 const editTask = ref(props.task);
 
-// watch(() => props.task, (newTask) => {
-//     editTask.value = newTask;
-// });
-//props.task が変更されるたびに、watch がコールバック関数を実行。
-//(newTask) => { editTask.value = newTask; }（コールバック関数）
-
 const saveTask = () => {
     if (editTask.value.trim()) {
         emit('saveTask', props.index, editTask.value.trim());
@@ -38,13 +32,9 @@ const handleDelete = () => {
     emit('deleteTask', props.index);
 };
 
-// const update = () => {
-//     editTask.value = props.task;
-// };
-
 const handleEdit = () => {
-  emit('startEditing', props.index); // イベントをemit
-  editTask.value = props.task; // `editTask`の更新処理
+    emit('startEditing', props.index);
+    editTask.value = props.task;
 };
 </script>
 
@@ -55,16 +45,9 @@ const handleEdit = () => {
         <span v-if="!isEditing">{{ task }}</span>
         <input v-else type="text" v-model="editTask">
         <ButtonComponent v-if="!isEditing" label="編集" @click="handleEdit"/>
-        <!-- <ButtonComponent v-if="!isEditing" label="編集" @click="() => { emit('startEditing', index); update(); }" /> -->
-            <!-- @click=の関数を一つにまとめる -->
         <ButtonComponent v-else label="保存" @click="saveTask" />
         <ButtonComponent label="削除" @click="handleDelete" />
     </li>
-    <!-- <p>
-        {{ index }}<br>
-        {{ task }}<br>
-        {{ editTask }}
-    </p> -->
 </template>
 
 
