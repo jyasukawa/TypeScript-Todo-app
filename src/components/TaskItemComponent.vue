@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue';
-import ButtonComponent from './ButtonComponent.vue';
+import TaskButtons from './TaskButtons.vue';
 
 const props = defineProps<{
     task: string
@@ -38,19 +38,18 @@ const handleEdit = () => {
 };
 </script>
 
-
-
 <template>
     <li>
         <span v-if="!isEditing">{{ task }}</span>
         <input v-else type="text" v-model="editTask">
-        <ButtonComponent v-if="!isEditing" label="編集" @click="handleEdit"/>
-        <ButtonComponent v-else label="保存" @click="saveTask" />
-        <ButtonComponent label="削除" @click="handleDelete" />
+        <TaskButtons 
+            :isEditing="isEditing"
+            @edit="handleEdit"
+            @save="saveTask"
+            @delete="handleDelete"
+        />
     </li>
 </template>
-
-
 
 <style scoped>
 li {
